@@ -28,7 +28,7 @@ client.once('ready', () => {
 });
 
 client.on('message', message => {
-  /* #22 emoji only message deletion feature */
+  /* emoji only message deletion feature */
   console.log(
     'reading a messsage:'
     , message.content
@@ -58,9 +58,24 @@ client.on('message', message => {
     str = newStr;
     newStr = str.replace(String.fromCharCode(65039), '');
     if (count > 10) break;
+    count++;
   }
 
-  if (str.length === 0) {
+  // weird bug on embed
+  let embedCheck = false;
+  for (let embed of message.embeds) { // these are some of the properties
+    embedCheck = true;
+    break;
+    console.log(`
+      Title: ${embed.title}
+      Author: ${embed.author}
+      Description: ${embed.description}
+    `);
+  }
+
+  if (
+    str.length === 0 && message.attachments.size < 1 && !embedCheck
+  ) {
     console.log('empty content detected!');
     client.channels.get(logsChannelID).send(
       `a message from <@${message.author.id}> on `
@@ -69,7 +84,7 @@ client.on('message', message => {
     );
     message.delete();
   }
-  /* #22 emoji only message deletion feature */
+  /* emoji only message deletion feature */
 
   if (message.content === '&ping') {
     const pings = [
